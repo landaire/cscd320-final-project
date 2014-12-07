@@ -112,7 +112,7 @@ func GetAllInvoices() []*Invoice {
 	var count int
 	rows.Scan(&count)
 
-	rows, err = db.Query("SELECT * FROM Invoice")
+	rows, err = db.Query("SELECT i.*, c.* FROM Invoice i NATURAL JOIN Customer c")
 	if err != nil {
 		Log.Error(err)
 		return []*Invoice{}
@@ -121,7 +121,11 @@ func GetAllInvoices() []*Invoice {
 	invoices := make([]*Invoice, 0, count)
 	for rows.Next() {
 		invoice := &Invoice{}
-		err := rows.Scan(&invoice.OrderNumber, &invoice.CustomerNumber, &invoice.OrderDate, &invoice.Status)
+		customer := &Customer{}
+		err := rows.Scan(&invoice.OrderNumber, &invoice.CustomerNumber, &invoice.OrderDate, &invoice.Status,
+			&customer.Number, &customer.Name, &customer.Street, &customer.City, &customer.State, &customer.Zip)
+
+		invoice.customer = customer
 
 		if err != nil {
 			Log.Error(err)
@@ -137,7 +141,7 @@ func GetAllInvoices() []*Invoice {
 // Gets the line items associated with this Invoice
 func (i *Invoice) GetLineItems() []*InvoiceLineItem {
 	if i.lineItems == nil {
-		rows, err := db.Query("SELECT li.* FROM InvoiceLineItem li WHERE li.OrderNum = ?", i.OrderNumber)
+		rows, err := db.Query("SELECT li.*, p.* FROM InvoiceLineItem li NATURAL JOIN Inventory p WHERE li.OrderNum = ?", i.OrderNumber)
 		// Errors shouldn't happen here....
 		if err != nil {
 			Log.Error(err)
@@ -150,7 +154,12 @@ func (i *Invoice) GetLineItems() []*InvoiceLineItem {
 
 		for rows.Next() {
 			lineItem := &InvoiceLineItem{}
-			err := rows.Scan(&lineItem.OrderNumber, &lineItem.LineNumber, &lineItem.Sku, &lineItem.Quantity)
+			product := &Product{}
+			err := rows.Scan(&lineItem.OrderNumber, &lineItem.LineNumber, &lineItem.Sku, &lineItem.Quantity,
+				&product.Sku, &product.SupplierNum, &product.Description, &product.Qoh, &product.Cost,
+				&product.UnitPrice, &product.UnitWeight)
+
+			lineItem.product = product
 
 			if err != nil {
 				Log.Error(err)
