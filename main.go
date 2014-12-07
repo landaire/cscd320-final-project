@@ -55,8 +55,4 @@ func handleIndex(w http.ResponseWriter, req *http.Request) {
 		totalWeight,
 	}
 	template.Execute(w, data)
-	//	invoice := Invoice{}
-	//	invoice.OrderNumber = 1920
-	//
-	//	Log.Printf("%#v\n", invoice.GetLineItems())
 }
