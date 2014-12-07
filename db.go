@@ -12,7 +12,7 @@ func init() {
 	// If your database has a password, modify this to be <user>:<pass>@<host>/<DBName>
 	if db == nil {
 		var err error
-		db, err = sql.Open("mysql", "root@/SalesOrders")
+		db, err = sql.Open("mysql", "root@/SalesOrders?parseTime=true")
 		if err != nil {
 			Log.Fatal("An error occurred when attempting to connect to the database: ", err)
 		}

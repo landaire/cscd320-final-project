@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
@@ -23,8 +24,39 @@ func main() {
 }
 
 func handleIndex(w http.ResponseWriter, req *http.Request) {
-	invoice := Invoice{}
-	invoice.OrderNumber = 1920
+	invoices := GetAllInvoices()
 
-	Log.Printf("%#v\n", invoice.GetLineItems())
+	totalOrders := len(invoices)
+	var totalItems int
+	var totalSales float32
+	var totalWeight float64
+
+	for _, invoice := range invoices {
+		for _, lineItem := range invoice.GetLineItems() {
+			totalItems += lineItem.Quantity
+			totalWeight += lineItem.ExtendedWeight()
+		}
+
+		totalSales += invoice.OrderTotal()
+	}
+
+	template := template.Must(template.ParseFiles("./views/index.html"))
+	data := struct {
+		Invoices    []*Invoice
+		TotalOrders int
+		TotalSales  float32
+		TotalItems  int
+		TotalWeight float64
+	}{
+		invoices,
+		totalOrders,
+		totalSales,
+		totalItems,
+		totalWeight,
+	}
+	template.Execute(w, data)
+	//	invoice := Invoice{}
+	//	invoice.OrderNumber = 1920
+	//
+	//	Log.Printf("%#v\n", invoice.GetLineItems())
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Sales Report</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Sales Report</h1>
+        </div>
+        <p>
+            <span class="label label-primary">Total Orders</span> {{ .TotalOrders }} <br>
+            <span class="label label-success">Total Sales</span> ${{ .TotalSales | printf "%.2f" }} <br>
+            <span class="label label-info">Total Items</span> {{ .TotalItems }} <br>
+            <span class="label label-default">Total Weight</span> {{ .TotalWeight | printf "%.2f" }}
+        </p>
+
+        {{ range .Invoices }}
+            <h4>Order Number: <small>{{ .OrderNumber }}</small></h4>
+            <h4>Order Date: <small>{{ .OrderDate }}</small></h4>
+            {{ with $customer := .GetCustomer }}
+            <address>
+                {{ $customer.Name }}<br>
+                {{ $customer.Street }}<br>
+                {{ $customer.City }}, {{ $customer.State }} {{ $customer.Zip }}<br>
+            </address>
+            {{ end }}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Weight</th>
+                        <th>Extended Price</th>
+                        <th>Extended Weight</th>
+                        <th>Order Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .GetLineItems }}
+                        <tr>
+                            <td>{{ .GetProduct.Sku }}</td>
+                            <td>{{ .GetProduct.Description }}</td>
+                            <td>${{ .GetProduct.UnitPrice | printf "%.2f" }}</td>
+                            <td>{{ .Quantity}}</td>
+                            <td>{{ .GetProduct.UnitWeight | printf "%.2f" }}</td>
+                            <td>${{ .ExtendedPrice | printf "%.2f" }}</td>
+                            <td>{{ .ExtendedWeight | printf "%.2f" }}</td>
+                        </tr>
+                    {{ end }}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>${{ .OrderTotal | printf "%.2f" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+        {{ end }}
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
