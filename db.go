@@ -18,8 +18,3 @@ func init() {
 		}
 	}
 }
-
-type Order struct {
-	Customer Customer
-	Invoice  Invoice
-}
