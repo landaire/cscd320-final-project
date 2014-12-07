@@ -9,13 +9,11 @@
     <div class="container">
         <div class="page-header">
             <h1>Sales Report</h1>
-        </div>
-        <p>
             <span class="label label-primary">Total Orders</span> {{ .TotalOrders }} <br>
             <span class="label label-success">Total Sales</span> ${{ .TotalSales | printf "%.2f" }} <br>
             <span class="label label-info">Total Items</span> {{ .TotalItems }} <br>
             <span class="label label-default">Total Weight</span> {{ .TotalWeight | printf "%.2f" }}
-        </p>
+        </div>
 
         {{ range .Invoices }}
             <h4>Order Number: <small>{{ .OrderNumber }}</small></h4>
