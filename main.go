@@ -28,7 +28,7 @@ func handleIndex(w http.ResponseWriter, req *http.Request) {
 
 	totalOrders := len(invoices)
 	var totalItems int
-	var totalSales float32
+	var totalSales, totalProfit float32
 	var totalWeight float64
 
 	for _, invoice := range invoices {
@@ -37,22 +37,32 @@ func handleIndex(w http.ResponseWriter, req *http.Request) {
 			totalWeight += lineItem.ExtendedWeight()
 		}
 
+		// At this point, this is actually the "total cost"
+		totalProfit += invoice.OrderCost()
 		totalSales += invoice.OrderTotal()
 	}
 
+	totalProfit = totalSales - totalProfit
+
 	template := template.Must(template.ParseFiles("./views/index.html"))
 	data := struct {
-		Invoices    []*Invoice
-		TotalOrders int
-		TotalSales  float32
-		TotalItems  int
-		TotalWeight float64
+		Invoices           []*Invoice
+		TotalOrders        int
+		TotalSales         float32
+		TotalItems         int
+		TotalWeight        float64
+		TotalProfit        float32
+		AverageOrderAmount float32
+		AverageOrderProfit float32
 	}{
 		invoices,
 		totalOrders,
 		totalSales,
 		totalItems,
 		totalWeight,
+		totalProfit,
+		totalSales / float32(len(invoices)),
+		totalProfit / float32(len(invoices)),
 	}
 	template.Execute(w, data)
 }

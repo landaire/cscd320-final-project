@@ -102,6 +102,19 @@ func (i *Invoice) OrderTotal() float32 {
 	return total
 }
 
+func (i *Invoice) OrderCost() float32 {
+	var cost float32
+	for _, lineItem := range i.GetLineItems() {
+		cost += lineItem.ExtendedCost()
+	}
+
+	return cost
+}
+
+func (i *Invoice) OrderProfit() float32 {
+	return i.OrderTotal() - i.OrderCost()
+}
+
 func GetAllInvoices() []*Invoice {
 	rows, err := db.Query("SELECT COUNT(*) FROM Invoice")
 	if err != nil {
@@ -197,6 +210,14 @@ func (i *InvoiceLineItem) GetProduct() *Product {
 }
 
 // Use a pointer in case the product hasn't yet been looked up
+func (i *InvoiceLineItem) ExtendedCost() float32 {
+	return i.GetProduct().Cost * float32(i.Quantity)
+}
+
+func (i *InvoiceLineItem) ExtendedProfit() float32 {
+	return i.ExtendedPrice() - i.ExtendedCost()
+}
+
 func (i *InvoiceLineItem) ExtendedPrice() float32 {
 	return i.GetProduct().UnitPrice * float32(i.Quantity)
 }

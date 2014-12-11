@@ -4,15 +4,49 @@
     <meta charset="UTF-8">
     <title>Sales Report</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <style type="text/css">
+        /* Align all cells to the right by default since almost all are numbers */
+        table tr td, table tr th {
+            text-align: right;
+        }
+
+        table tr td.text, table tr th.text {
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="page-header">
             <h1>Sales Report</h1>
-            <span class="label label-primary">Total Orders</span> {{ .TotalOrders }} <br>
-            <span class="label label-success">Total Sales</span> ${{ .TotalSales | printf "%.2f" }} <br>
-            <span class="label label-info">Total Items</span> {{ .TotalItems }} <br>
-            <span class="label label-default">Total Weight</span> {{ .TotalWeight | printf "%.2f" }}
+        </div>
+
+        <div class="well">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Total Orders</th>
+                        <th>Total Sales</th>
+                        <th>Total Items</th>
+                        <th>Total Weight</th>
+                        <th>Total Profit</th>
+                        <th>Average Order Amount</th>
+                        <th>Average Order Profit Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="success">
+                        <td>{{ .TotalOrders }}</td>
+                        <td>${{ .TotalSales | printf "%.2f" }}</td>
+                        <td>{{ .TotalItems }}</td>
+                        <td>{{ .TotalWeight | printf "%.2f" }}</td>
+                        <td>${{ .TotalProfit | printf "%.2f" }}</td>
+                        <td>${{ .AverageOrderAmount | printf "%.2f" }}</td>
+                        <td>${{ .AverageOrderProfit | printf "%.2f" }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         {{ range .Invoices }}
@@ -28,25 +62,28 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>SKU</th>
-                        <th>Description</th>
+                        <th class="text">SKU</th>
+                        <th class="text">Description</th>
                         <th>Price</th>
                         <th>Quantity</th>
                         <th>Weight</th>
                         <th>Extended Price</th>
+                        <th>Extended Profit</th>
                         <th>Extended Weight</th>
                         <th>Order Total</th>
+                        <th>Order Profit</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{ range .GetLineItems }}
                         <tr>
-                            <td>{{ .GetProduct.Sku }}</td>
-                            <td>{{ .GetProduct.Description }}</td>
+                            <td class="text">{{ .GetProduct.Sku }}</td>
+                            <td class="text">{{ .GetProduct.Description }}</td>
                             <td>${{ .GetProduct.UnitPrice | printf "%.2f" }}</td>
                             <td>{{ .Quantity}}</td>
                             <td>{{ .GetProduct.UnitWeight | printf "%.2f" }}</td>
                             <td>${{ .ExtendedPrice | printf "%.2f" }}</td>
+                            <td>${{ .ExtendedProfit | printf "%.2f" }}</td>
                             <td>{{ .ExtendedWeight | printf "%.2f" }}</td>
                         </tr>
                     {{ end }}
@@ -58,7 +95,9 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td>${{ .OrderTotal | printf "%.2f" }}</td>
+                        <td>${{ .OrderProfit | printf "%.2f" }}</td>
                     </tr>
                 </tbody>
             </table>
